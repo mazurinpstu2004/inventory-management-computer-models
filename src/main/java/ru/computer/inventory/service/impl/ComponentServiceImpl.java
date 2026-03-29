@@ -1,0 +1,49 @@
+package ru.computer.inventory.service.impl;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import ru.computer.inventory.entity.Component;
+import ru.computer.inventory.repository.ComponentRepository;
+import ru.computer.inventory.service.ComponentService;
+
+import java.util.List;
+
+@Service
+public class ComponentServiceImpl implements ComponentService {
+
+    private final ComponentRepository componentRepository;
+
+    @Autowired
+    public ComponentServiceImpl(ComponentRepository componentRepository) {
+        this.componentRepository = componentRepository;
+    }
+
+    @Override
+    @Transactional
+    public Component create(Component component) {
+        return componentRepository.save(component);
+    }
+
+    @Override
+    public Component getById(Long id) {
+        return componentRepository.findById(id).orElseThrow(() -> new RuntimeException("Component not found"));
+    }
+
+    @Override
+    public List<Component> getAll() {
+        return componentRepository.findAll();
+    }
+
+    @Override
+    @Transactional
+    public Component update(Long id, Component component) {
+        return componentRepository.save(component);
+    }
+
+    @Override
+    @Transactional
+    public void delete(Long id) {
+        componentRepository.deleteById(id);
+    }
+}
