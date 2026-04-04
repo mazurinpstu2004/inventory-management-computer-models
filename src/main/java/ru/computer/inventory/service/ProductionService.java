@@ -8,11 +8,14 @@ public interface ProductionService {
 
     ProductionLog create(ProductionLog productionLog);
 
-    ProductionLog getById(Long id);
+    ProductionLog readById(Long id);
 
-    List<ProductionLog> getAll();
+    List<ProductionLog> readAll();
 
     ProductionLog update(Long id, ProductionLog productionLog);
 
     void delete(Long id);
+
+    ProductionLog registerAssembly(Long modelId, Long userId);
+
 }

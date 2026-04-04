@@ -27,12 +27,12 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public User findById(Long id) {
+    public User readById(Long id) {
         return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
     }
 
     @Override
-    public List<User> findAll() {
+    public List<User> readAll() {
         return userRepository.findAll();
     }
 

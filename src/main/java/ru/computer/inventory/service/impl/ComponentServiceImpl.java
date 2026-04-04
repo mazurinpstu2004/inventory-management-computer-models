@@ -26,12 +26,12 @@ public class ComponentServiceImpl implements ComponentService {
     }
 
     @Override
-    public Component getById(Long id) {
+    public Component readById(Long id) {
         return componentRepository.findById(id).orElseThrow(() -> new RuntimeException("Component not found"));
     }
 
     @Override
-    public List<Component> getAll() {
+    public List<Component> readAll() {
         return componentRepository.findAll();
     }
 
@@ -46,4 +46,23 @@ public class ComponentServiceImpl implements ComponentService {
     public void delete(Long id) {
         componentRepository.deleteById(id);
     }
+
+    @Override
+    public void addStock(Long id, Integer amount) {
+        Component component = readById(id);
+        component.setQuantity(component.getQuantity() + amount);
+        componentRepository.save(component);
+    }
+
+    @Override
+    public List<Component> getLowStockAlerts(Integer quantity) {
+        return componentRepository.findAllByQuantityLessThan(quantity);
+    }
+
+    @Override
+    public List<Component> searchComponents(String name, String category, Double minPrice, Double maxPrice) {
+        return componentRepository.findByFilters(name, category, minPrice, maxPrice);
+    }
+
+
 }
