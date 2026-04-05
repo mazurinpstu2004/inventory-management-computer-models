@@ -8,5 +8,5 @@ public class ComponentResponseDTO {
     private String name;
     private String category;
     private Double price;
-    private Long quantity;
+    private Integer quantity;
 }

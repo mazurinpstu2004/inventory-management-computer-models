@@ -15,11 +15,12 @@ public interface ComponentRepository extends JpaRepository<Component, Long> {
 
     List<Component> findAllByQuantityLessThan(Integer quantity);
 
-    @Query("SELECT c FROM Component c WHERE " +
-            "(:name IS NULL OR LOWER(c.name) LIKE LOWER(CONCAT('%', :name, '%'))) AND " +
-            "(:category IS NULL OR c.category = :category) AND " +
+    @Query(value = "SELECT * FROM components c WHERE " +
+            "(:name IS NULL OR LOWER(c.name) LIKE LOWER(CONCAT('%', CAST(:name AS text), '%'))) AND " +
+            "(:category IS NULL OR c.category = CAST(:category AS text)) AND " +
             "(:minPrice IS NULL OR c.price >= :minPrice) AND " +
-            "(:maxPrice IS NULL OR c.price <= :maxPrice)")
+            "(:maxPrice IS NULL OR c.price <= :maxPrice)",
+            nativeQuery = true)
     List<Component> findByFilters(@Param("name") String name,
                                   @Param("category") String category,
                                   @Param("minPrice") Double minPrice,
