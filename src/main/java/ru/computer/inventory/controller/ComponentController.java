@@ -1,6 +1,7 @@
 package ru.computer.inventory.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.computer.inventory.dto.ComponentRequestDTO;
 import ru.computer.inventory.dto.ComponentResponseDTO;
@@ -19,25 +20,6 @@ public class ComponentController {
     @Autowired
     public ComponentController(ComponentServiceImpl componentService) {
         this.componentService = componentService;
-    }
-
-    @PostMapping
-    public ComponentResponseDTO create(@RequestBody ComponentRequestDTO request) {
-        Component component = new Component();
-        component.setName(request.getName());
-        component.setCategory(request.getCategory());
-        component.setPrice(request.getPrice());
-        component.setQuantity(request.getQuantity());
-
-        Component saved = componentService.create(component);
-
-        ComponentResponseDTO response = new ComponentResponseDTO();
-        response.setId(saved.getId());
-        response.setName(saved.getName());
-        response.setCategory(saved.getCategory());
-        response.setPrice(saved.getPrice());
-        response.setQuantity(saved.getQuantity());
-        return response;
     }
 
     @GetMapping("/search")
@@ -60,6 +42,71 @@ public class ComponentController {
                 }).collect(Collectors.toList());
     }
 
+    @PreAuthorize("hasAuthority('Администратор')")
+    @PostMapping
+    public ComponentResponseDTO create(@RequestBody ComponentRequestDTO request) {
+        Component component = new Component();
+        component.setName(request.getName());
+        component.setCategory(request.getCategory());
+        component.setPrice(request.getPrice());
+        component.setQuantity(request.getQuantity());
+
+        Component saved = componentService.create(component);
+
+        ComponentResponseDTO response = new ComponentResponseDTO();
+        response.setId(saved.getId());
+        response.setName(saved.getName());
+        response.setCategory(saved.getCategory());
+        response.setPrice(saved.getPrice());
+        response.setQuantity(saved.getQuantity());
+        return response;
+    }
+
+    @PreAuthorize("hasAuthority('Администратор')")
+    @GetMapping
+    public List<ComponentResponseDTO> getComponents() {
+        return componentService.readAll()
+                .stream()
+                .map(entity -> {
+                    ComponentResponseDTO response = new ComponentResponseDTO();
+                    response.setId(entity.getId());
+                    response.setName(entity.getName());
+                    response.setCategory(entity.getCategory());
+                    response.setPrice(entity.getPrice());
+                    response.setQuantity(entity.getQuantity());
+                    return response;
+                }).collect(Collectors.toList());
+    }
+
+    @PreAuthorize("hasAuthority('Администратор')")
+    @PutMapping("/{id}")
+    public ComponentResponseDTO update(@PathVariable Long id, @RequestBody ComponentRequestDTO request) {
+        Component component = new Component();
+        component.setId(id);
+        component.setName(request.getName());
+        component.setCategory(request.getCategory());
+        component.setPrice(request.getPrice());
+        component.setQuantity(request.getQuantity());
+
+        Component updated = componentService.update(id, component);
+
+        ComponentResponseDTO response = new ComponentResponseDTO();
+        response.setId(updated.getId());
+        response.setName(updated.getName());
+        response.setCategory(updated.getCategory());
+        response.setPrice(updated.getPrice());
+        response.setQuantity(updated.getQuantity());
+
+        return response;
+    }
+
+    @PreAuthorize("hasAuthority('Администратор')")
+    @DeleteMapping("/{id}")
+    public void deleteComponent(@PathVariable Long id) {
+        componentService.delete(id);
+    }
+
+    @PreAuthorize("hasAuthority('Администратор')")
     @PatchMapping("/{id}/add")
     public void addStock(@PathVariable Long id, @RequestParam Integer amount) {
         componentService.addStock(id, amount);

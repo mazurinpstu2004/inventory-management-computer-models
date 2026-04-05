@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.computer.inventory.dto.AuthResponse;
 import ru.computer.inventory.dto.LoginRequest;
 import ru.computer.inventory.dto.UserRequestDTO;
+import ru.computer.inventory.entity.Role;
 import ru.computer.inventory.entity.User;
 import ru.computer.inventory.jwt.JwtService;
 import ru.computer.inventory.repository.RoleRepository;
@@ -52,8 +53,18 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional
-    public User update(User user) {
-        return userRepository.save(user);
+    public User update(Long id, UserRequestDTO dto) {
+        User existingUser = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        existingUser.setUsername(dto.getUsername());
+        existingUser.setFullName(dto.getFullName());
+
+        if (dto.getPassword() != null && !dto.getPassword().isEmpty()) {
+            existingUser.setPassword(passwordEncoder.encode(dto.getPassword()));
+        }
+
+        return userRepository.save(existingUser);
     }
 
     @Override
@@ -92,5 +103,19 @@ public class AuthServiceImpl implements AuthService {
         user.setRole(roleRepository.findByName("Пользователь"));
 
         return userRepository.save(user);
+    }
+
+    @Override
+    public void updateRole(Long id, String roleName) {
+        User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+
+        Role role = roleRepository.findByName(roleName);
+
+        if (role == null) {
+            throw new RuntimeException("Role not found");
+        }
+
+        user.setRole(role);
+        userRepository.save(user);
     }
 }

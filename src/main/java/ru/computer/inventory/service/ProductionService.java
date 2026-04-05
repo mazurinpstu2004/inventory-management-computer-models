@@ -16,6 +16,6 @@ public interface ProductionService {
 
     void delete(Long id);
 
-    ProductionLog registerAssembly(Long modelId, Long userId);
+    ProductionLog registerAssembly(Long modelId);
 
 }

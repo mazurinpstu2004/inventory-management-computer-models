@@ -1,6 +1,7 @@
 package ru.computer.inventory.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.computer.inventory.entity.*;
@@ -60,11 +61,17 @@ public class ProductionServiceImpl implements ProductionService {
 
     @Override
     @Transactional
-    public ProductionLog registerAssembly(Long modelId, Long userId) {
+    public ProductionLog registerAssembly(Long modelId) {
+
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
 
         Model model = modelRepository.findById(modelId).orElseThrow(() -> new RuntimeException("Model not found"));
 
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findByUsername(login);
+
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
 
         List<ModelStructure> structures = modelStructureRepository.findAllByModelId(modelId);
 

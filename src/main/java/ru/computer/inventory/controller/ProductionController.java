@@ -2,6 +2,7 @@ package ru.computer.inventory.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.computer.inventory.dto.AssemblyRequestDTO;
 import ru.computer.inventory.dto.ProductionLogResponseDTO;
@@ -28,7 +29,7 @@ public class ProductionController {
     @PostMapping("/assemble")
     public ResponseEntity<?> assemble(@RequestBody AssemblyRequestDTO request) {
         try {
-            ProductionLog productionLog = productionService.registerAssembly(request.getModelId(), request.getUserId());
+            ProductionLog productionLog = productionService.registerAssembly(request.getModelId());
 
             ProductionLogResponseDTO response = new ProductionLogResponseDTO();
             response.setId(productionLog.getId());
@@ -42,6 +43,7 @@ public class ProductionController {
         }
     }
 
+    @PreAuthorize("hasAuthority('Администратор')")
     @GetMapping("/logs")
     public List<ProductionLogResponseDTO> getProductionLogs() {
         return productionService.readAll().stream().map(productionLog -> {
