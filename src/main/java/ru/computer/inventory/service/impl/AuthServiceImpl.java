@@ -1,9 +1,15 @@
 package ru.computer.inventory.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.computer.inventory.dto.AuthResponse;
+import ru.computer.inventory.dto.LoginRequest;
+import ru.computer.inventory.dto.UserRequestDTO;
 import ru.computer.inventory.entity.User;
+import ru.computer.inventory.jwt.JwtService;
+import ru.computer.inventory.repository.RoleRepository;
 import ru.computer.inventory.repository.UserRepository;
 import ru.computer.inventory.service.AuthService;
 
@@ -12,12 +18,20 @@ import java.util.List;
 @Service
 public class AuthServiceImpl implements AuthService {
 
-
     private final UserRepository userRepository;
 
+    private final RoleRepository roleRepository;
+
+    private final PasswordEncoder passwordEncoder;
+
+    private final JwtService jwtService;
+
     @Autowired
-    public AuthServiceImpl(UserRepository userRepository) {
+    public AuthServiceImpl(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder, JwtService jwtService) {
         this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
 
     @Override
@@ -46,5 +60,37 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public void delete(Long id) {
         userRepository.deleteById(id);
+    }
+
+    @Override
+    public AuthResponse login(LoginRequest request) {
+        User user = userRepository.findByUsername(request.getUsername());
+
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new RuntimeException("Incorrect password");
+        }
+
+        String token = jwtService.generateToken(
+                user.getUsername(),
+                user.getId(),
+                user.getRole().getName()
+        );
+
+        return new AuthResponse(token);
+    }
+
+    @Override
+    public User register(UserRequestDTO userDto) {
+        User user = new User();
+        user.setUsername(userDto.getUsername());
+        user.setFullName(userDto.getFullName());
+        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+        user.setRole(roleRepository.findByName("Пользователь"));
+
+        return userRepository.save(user);
     }
 }
