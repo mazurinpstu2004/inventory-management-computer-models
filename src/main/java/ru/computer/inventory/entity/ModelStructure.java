@@ -13,13 +13,13 @@ public class ModelStructure {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "model_id", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "model_id", nullable = false)
     private Model model;
 
     @ManyToOne
-    @JoinColumn(name = "component_id", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "component_id", nullable = false)
     private Component component;
 
-    @Column(name = "quantity")
+    @Column(nullable = false)
     private Integer quantity;
 }

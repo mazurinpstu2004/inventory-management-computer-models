@@ -15,11 +15,12 @@ public class ProductionLog {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "model_id", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "model_id", nullable = false)
     private Model model;
 
+    // nullable = true позволяет оставить запись после удаления пользователя
     @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = true)
     private User user;
 
     @Column(name = "date")

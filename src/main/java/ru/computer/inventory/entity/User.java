@@ -12,11 +12,11 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "role_id", referencedColumnName = "id", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "role_id", nullable = false)
     private Role role;
 
-    @Column(name = "username", unique = true, nullable = false)
+    @Column(unique = true, nullable = false)
     private String username;
 
     @Column(name = "password_hash", nullable = false)
@@ -24,4 +24,8 @@ public class User {
 
     @Column(name = "full_name", nullable = false)
     private String fullName;
+
+    // Список логов для навигации, без каскадного удаления!
+    @OneToMany(mappedBy = "user")
+    private java.util.List<ProductionLog> productionLogs;
 }
