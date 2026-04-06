@@ -149,18 +149,38 @@ public class ReportServiceImpl implements ReportService {
             titleRun.setBold(true);
             titleRun.setFontSize(16);
             titleRun.addBreak();
+
             XWPFTable table = document.createTable(data.size() + 1, headers.length);
+
+            org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTblPr tblPr = table.getCTTbl().getTblPr();
+            if (tblPr == null) tblPr = table.getCTTbl().addNewTblPr();
+            org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTblWidth tblWidth =
+                    tblPr.isSetTblW() ? tblPr.getTblW() : tblPr.addNewTblW();
+            tblWidth.setType(org.openxmlformats.schemas.wordprocessingml.x2006.main.STTblWidth.PCT);
+            tblWidth.setW(java.math.BigInteger.valueOf(5000));
+
             table.setTableAlignment(TableRowAlign.CENTER);
+
             XWPFTableRow headerRow = table.getRow(0);
             for (int i = 0; i < headers.length; i++) {
-                headerRow.getCell(i).setText(headers[i]);
-                headerRow.getCell(i).getCTTc().addNewTcPr().addNewShd().setFill("D3D3D3");
+                XWPFTableCell cell = headerRow.getCell(i);
+                XWPFParagraph p = cell.getParagraphs().get(0);
+                p.setAlignment(ParagraphAlignment.CENTER);
+                XWPFRun r = p.createRun();
+                r.setText(headers[i]);
+                r.setBold(true);
+                cell.getCTTc().addNewTcPr().addNewShd().setFill("D3D3D3");
             }
+
             for (int i = 0; i < data.size(); i++) {
                 XWPFTableRow row = table.getRow(i + 1);
                 String[] rowData = data.get(i);
-                for (int j = 0; j < rowData.length; j++) row.getCell(j).setText(rowData[j]);
+                for (int j = 0; j < rowData.length; j++) {
+                    XWPFTableCell cell = row.getCell(j);
+                    cell.setText(rowData[j]);
+                }
             }
+
             document.write(out);
             return out.toByteArray();
         }
