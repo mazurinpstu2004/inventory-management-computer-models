@@ -1,5 +1,6 @@
 package service;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -77,8 +78,8 @@ public class ProductionServiceTest {
         Authentication auth = Mockito.mock(Authentication.class);
         SecurityContext securityContext = Mockito.mock(SecurityContext.class);
 
-        Mockito.when(auth.getName()).thenReturn(testUser.getUsername());
-        Mockito.when(securityContext.getAuthentication()).thenReturn(auth);
+        Mockito.lenient().when(auth.getName()).thenReturn(testUser.getUsername());
+        Mockito.lenient().when(securityContext.getAuthentication()).thenReturn(auth);
         SecurityContextHolder.setContext(securityContext);
     }
 

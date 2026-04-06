@@ -157,7 +157,7 @@ public class AuthServiceTest {
     }
 
     @Test
-    public void negativeLoginInvalidPasswordTest() {
+    public void negativeLoginTest() {
         LoginRequestDTO request = new LoginRequestDTO("testUser", "wrongPassword");
 
         Mockito.when(userRepository.findByUsername("testUser")).thenReturn(testUser);
@@ -190,6 +190,17 @@ public class AuthServiceTest {
         Assertions.assertEquals("encodedNewPassword", registered.getPassword());
         Assertions.assertEquals("Пользователь", registered.getRole().getName());
         Mockito.verify(userRepository).save(any(User.class));
+    }
+
+    @Test
+    public void negativeRegisterTest() {
+        UserRequestDTO dto = new UserRequestDTO();
+        dto.setUsername("existingUser");
+        dto.setPassword("somePassword");
+
+        Mockito.when(userRepository.findByUsername("existingUser")).thenReturn(testUser);
+
+        Assertions.assertThrows(UserAlreadyExistsException.class, () -> authService.register(dto));
     }
 
     @Test
