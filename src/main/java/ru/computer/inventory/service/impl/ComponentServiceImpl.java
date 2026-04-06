@@ -65,14 +65,7 @@ public class ComponentServiceImpl implements ComponentService {
     }
 
     @Override
-    public List<Component> getLowStockAlerts(Integer quantity) {
-        return componentRepository.findAllByQuantityLessThan(quantity);
-    }
-
-    @Override
     public List<Component> searchComponents(String name, String category, Double minPrice, Double maxPrice) {
         return componentRepository.findByFilters(name, category, minPrice, maxPrice);
     }
-
-
 }

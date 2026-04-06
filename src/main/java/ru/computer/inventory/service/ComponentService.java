@@ -18,7 +18,5 @@ public interface ComponentService {
 
     void addStock(Long id, Integer amount);
 
-    List<Component> getLowStockAlerts(Integer quantity);
-
     List<Component> searchComponents(String name, String category, Double minPrice, Double maxPrice);
 }
