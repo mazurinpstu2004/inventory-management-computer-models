@@ -26,10 +26,11 @@ public class ComponentServiceTest {
     @InjectMocks
     private ComponentServiceImpl componentService;
 
-    Component testComponent = new Component();
+    private Component testComponent;
 
     @BeforeEach
     public void setUp() {
+        testComponent = new Component();
         testComponent.setId(1L);
         testComponent.setName("testComponent");
         testComponent.setCategory("testCategory");
@@ -39,15 +40,12 @@ public class ComponentServiceTest {
 
     @Test
     public void createTest() {
-        Component component = new Component();
-        component.setName("testComponent");
+        Mockito.when(componentRepository.save(testComponent)).thenReturn(testComponent);
 
-        Mockito.when(componentRepository.save(component)).thenReturn(component);
+        Component createdComponent = componentService.create(testComponent);
 
-        Component createdComponent = componentService.create(component);
-
-        Assertions.assertEquals(component.getName(), createdComponent.getName());
-        Mockito.verify(componentRepository).save(component);
+        Assertions.assertEquals(testComponent.getName(), createdComponent.getName());
+        Mockito.verify(componentRepository).save(testComponent);
     }
 
     @Test
