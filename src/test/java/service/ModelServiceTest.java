@@ -66,9 +66,9 @@ public class ModelServiceTest {
     public void createTest() {
         Mockito.when(modelRepository.save(testModel)).thenReturn(testModel);
 
-        Model created = modelService.create(testModel);
+        Model createdModel = modelService.create(testModel);
 
-        Assertions.assertEquals(testModel.getName(), created.getName());
+        Assertions.assertEquals(testModel.getName(), createdModel.getName());
         Mockito.verify(modelRepository).save(testModel);
     }
 
@@ -94,7 +94,6 @@ public class ModelServiceTest {
 
         List<Model> models = modelService.readAll();
 
-
         Assertions.assertEquals(testModel, models.getFirst());
         Mockito.verify(modelRepository).findAll();
     }
@@ -107,9 +106,9 @@ public class ModelServiceTest {
         Mockito.when(modelRepository.existsById(1L)).thenReturn(true);
         Mockito.when(modelRepository.save(newData)).thenReturn(newData);
 
-        Model result = modelService.update(1L, newData);
+        Model updatedModel = modelService.update(1L, newData);
 
-        Assertions.assertEquals(newData.getName(), result.getName());
+        Assertions.assertEquals(newData.getName(), updatedModel.getName());
         Mockito.verify(modelRepository).save(newData);
     }
 
