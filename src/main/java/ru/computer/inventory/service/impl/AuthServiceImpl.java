@@ -5,10 +5,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.computer.inventory.dto.AuthResponse;
-import ru.computer.inventory.dto.LoginRequest;
+import ru.computer.inventory.dto.LoginRequestDTO;
 import ru.computer.inventory.dto.UserRequestDTO;
 import ru.computer.inventory.entity.Role;
 import ru.computer.inventory.entity.User;
+import ru.computer.inventory.exception.RoleNotFound;
+import ru.computer.inventory.exception.UserAlreadyExistsException;
+import ru.computer.inventory.exception.UserNotFoundException;
 import ru.computer.inventory.jwt.JwtService;
 import ru.computer.inventory.repository.RoleRepository;
 import ru.computer.inventory.repository.UserRepository;
@@ -38,12 +41,16 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public User create(User user) {
+        if (userRepository.findByUsername(user.getUsername()) != null) {
+            throw new UserAlreadyExistsException(user.getUsername());
+        }
         return userRepository.save(user);
     }
 
     @Override
     public User readById(Long id) {
-        return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+        return userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id.toString()));
     }
 
     @Override
@@ -55,7 +62,7 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public User update(Long id, UserRequestDTO dto) {
         User existingUser = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException(id.toString()));
 
         existingUser.setUsername(dto.getUsername());
         existingUser.setFullName(dto.getFullName());
@@ -70,19 +77,23 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public void delete(Long id) {
+        if (!userRepository.existsById(id)) {
+            throw new UserNotFoundException(id.toString());
+        }
+
         userRepository.deleteById(id);
     }
 
     @Override
-    public AuthResponse login(LoginRequest request) {
+    public AuthResponse login(LoginRequestDTO request) {
         User user = userRepository.findByUsername(request.getUsername());
 
         if (user == null) {
-            throw new RuntimeException("User not found");
+            throw new UserNotFoundException(request.getUsername());
         }
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Incorrect password");
+            throw new RuntimeException("Неверный пароль");
         }
 
         String token = jwtService.generateToken(
@@ -96,6 +107,10 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public User register(UserRequestDTO userDto) {
+        if (userRepository.findByUsername(userDto.getUsername()) != null) {
+            throw new UserAlreadyExistsException(userDto.getUsername());
+        }
+
         User user = new User();
         user.setUsername(userDto.getUsername());
         user.setFullName(userDto.getFullName());
@@ -112,7 +127,7 @@ public class AuthServiceImpl implements AuthService {
         Role role = roleRepository.findByName(roleName);
 
         if (role == null) {
-            throw new RuntimeException("Role not found");
+            throw new RoleNotFound(roleName);
         }
 
         user.setRole(role);

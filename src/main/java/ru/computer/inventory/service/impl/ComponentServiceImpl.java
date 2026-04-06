@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.computer.inventory.entity.Component;
+import ru.computer.inventory.exception.ResourceNotFoundException;
 import ru.computer.inventory.repository.ComponentRepository;
 import ru.computer.inventory.service.ComponentService;
 
@@ -27,7 +28,8 @@ public class ComponentServiceImpl implements ComponentService {
 
     @Override
     public Component readById(Long id) {
-        return componentRepository.findById(id).orElseThrow(() -> new RuntimeException("Component not found"));
+        return componentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Компонент", id));
     }
 
     @Override
@@ -38,12 +40,20 @@ public class ComponentServiceImpl implements ComponentService {
     @Override
     @Transactional
     public Component update(Long id, Component component) {
+        if (!componentRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Компонент", id);
+        }
+        component.setId(id);
         return componentRepository.save(component);
     }
 
     @Override
     @Transactional
     public void delete(Long id) {
+        if (!componentRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Компонент", id);
+        }
+
         componentRepository.deleteById(id);
     }
 

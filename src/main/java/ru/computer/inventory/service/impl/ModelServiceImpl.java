@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.computer.inventory.entity.Component;
 import ru.computer.inventory.entity.Model;
 import ru.computer.inventory.entity.ModelStructure;
+import ru.computer.inventory.exception.ResourceNotFoundException;
 import ru.computer.inventory.repository.ComponentRepository;
 import ru.computer.inventory.repository.ModelRepository;
 import ru.computer.inventory.repository.ModelStructureRepository;
@@ -37,7 +38,8 @@ public class ModelServiceImpl implements ModelService {
 
     @Override
     public Model readById(Long id) {
-        return modelRepository.findById(id).orElseThrow(() -> new RuntimeException("Model not found"));
+        return modelRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Модель", id));
     }
 
     @Override
@@ -48,12 +50,21 @@ public class ModelServiceImpl implements ModelService {
     @Override
     @Transactional
     public Model update(Long id, Model model) {
+        if (!modelRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Модель", id);
+        }
+
+        model.setId(id);
         return modelRepository.save(model);
     }
 
     @Override
     @Transactional
     public void delete(Long id) {
+        if (!modelRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Модель", id);
+        }
+
         modelRepository.deleteById(id);
     }
 
@@ -63,7 +74,7 @@ public class ModelServiceImpl implements ModelService {
         Model model = readById(modelId);
 
         Component component = componentRepository.findById(componentId).orElseThrow(()
-                -> new RuntimeException("Component not found"));
+                -> new ResourceNotFoundException("Component", componentId));
 
         ModelStructure structure = modelStructureRepository.findByModelIdAndComponentId(modelId, componentId);
 
@@ -81,11 +92,19 @@ public class ModelServiceImpl implements ModelService {
 
     @Override
     public List<ModelStructure> getModelComposition(Long modelId) {
+        if (!modelRepository.existsById(modelId)) {
+            throw new ResourceNotFoundException("Модель", modelId);
+        }
+
         return modelStructureRepository.findAllByModelId(modelId);
     }
 
     @Override
     public Double calculateModelCost(Long modelId) {
+        if (!modelRepository.existsById(modelId)) {
+            throw new ResourceNotFoundException("Модель", modelId);
+        }
+
         List<ModelStructure> structures = modelStructureRepository.findAllByModelId(modelId);
 
         return structures.stream()

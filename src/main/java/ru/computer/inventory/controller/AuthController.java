@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.computer.inventory.dto.AuthResponse;
-import ru.computer.inventory.dto.LoginRequest;
+import ru.computer.inventory.dto.LoginRequestDTO;
 import ru.computer.inventory.dto.UserRequestDTO;
 import ru.computer.inventory.dto.UserResponseDTO;
 import ru.computer.inventory.entity.User;
@@ -25,7 +25,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public AuthResponse login(@RequestBody LoginRequest loginRequest) {
+    public AuthResponse login(@RequestBody LoginRequestDTO loginRequest) {
         return authService.login(loginRequest);
     }
 
