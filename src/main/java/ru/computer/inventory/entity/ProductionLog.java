@@ -18,7 +18,6 @@ public class ProductionLog {
     @JoinColumn(name = "model_id", nullable = false)
     private Model model;
 
-    // nullable = true позволяет оставить запись после удаления пользователя
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = true)
     private User user;

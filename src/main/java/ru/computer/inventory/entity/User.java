@@ -3,6 +3,8 @@ package ru.computer.inventory.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.List;
+
 @Entity
 @Table(name = "users")
 @Data
@@ -25,7 +27,6 @@ public class User {
     @Column(name = "full_name", nullable = false)
     private String fullName;
 
-    // Список логов для навигации, без каскадного удаления!
     @OneToMany(mappedBy = "user")
-    private java.util.List<ProductionLog> productionLogs;
+    private List<ProductionLog> productionLogs;
 }

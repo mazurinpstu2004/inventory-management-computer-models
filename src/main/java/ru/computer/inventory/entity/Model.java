@@ -3,6 +3,8 @@ package ru.computer.inventory.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.List;
+
 @Entity
 @Table(name = "models")
 @Data
@@ -16,5 +18,5 @@ public class Model {
     private String name;
 
     @OneToMany(mappedBy = "model", cascade = CascadeType.ALL, orphanRemoval = true)
-    private java.util.List<ModelStructure> structures;
+    private List<ModelStructure> structures;
 }

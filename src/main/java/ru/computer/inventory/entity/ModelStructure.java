@@ -1,5 +1,6 @@
 package ru.computer.inventory.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -14,6 +15,7 @@ public class ModelStructure {
 
     @ManyToOne
     @JoinColumn(name = "model_id", nullable = false)
+    @JsonIgnore
     private Model model;
 
     @ManyToOne
