@@ -28,19 +28,15 @@ public class ProductionController {
 
     @PostMapping("/assemble")
     public ResponseEntity<?> assemble(@RequestBody AssemblyRequestDTO request) {
-        try {
-            ProductionLog productionLog = productionService.registerAssembly(request.getModelId());
+        ProductionLog productionLog = productionService.registerAssembly(request.getModelId());
 
-            ProductionLogResponseDTO response = new ProductionLogResponseDTO();
-            response.setId(productionLog.getId());
-            response.setModelName(productionLog.getModel().getName());
-            response.setAssembledBy(productionLog.getUser().getFullName());
-            response.setDate(productionLog.getDate().format(formatter));
+        ProductionLogResponseDTO response = new ProductionLogResponseDTO();
+        response.setId(productionLog.getId());
+        response.setModelName(productionLog.getModel().getName());
+        response.setAssembledBy(productionLog.getUser().getFullName());
+        response.setDate(productionLog.getDate().format(formatter));
 
-            return ResponseEntity.ok(response);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        return ResponseEntity.ok(response);
     }
 
     @PreAuthorize("hasAuthority('Администратор')")
